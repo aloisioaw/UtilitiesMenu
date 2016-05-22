@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
+# coding: utf-8
 
 # This code is an example for a tutorial on Ubuntu Unity/Gnome AppIndicators:
 # http://candidtim.github.io/appindicator/2014/09/13/ubuntu-appindicator-step-by-step.html
@@ -11,7 +11,9 @@ import subprocess
 import tkMessageBox
 import sys
 import window
+import ConfigParser
 
+from glob import glob
 from urllib2 import Request, urlopen, URLError
 from Tkinter import *
 
@@ -39,11 +41,47 @@ def build_menu():
 	item_agnclientd_restart.connect('activate', service_agnclientd_restart)
 	menu.append(item_agnclientd_restart)
 
+	menu.append(build_workspaces_menu())
+
+	image = gtk.Image()
+	image.set_pixel_size(1)
+	image.set_from_file(os.path.abspath('IMG/eclipse.xpm'))
+	menu_item = gtk.ImageMenuItem("Xucripse")
+	menu_item.set_image(image)
+	menu.append(menu_item)
+
 	item_quit = gtk.MenuItem('Fechar')
 	item_quit.connect('activate', quit)
 	menu.append(item_quit)
 	menu.show_all()
 	return menu
+
+def build_workspaces_menu():
+	workspaces_path = read_config("workspaces", "path")
+
+	item_workspaces = gtk.MenuItem('Eclipse')
+	menu_workspaces = gtk.Menu()
+	item_workspaces.set_submenu(menu_workspaces)
+
+	for entry in os.listdir(workspaces_path):
+		if (os.path.isfile(entry) == False):
+			for workspace_folder in os.listdir(os.path.join(workspaces_path, entry)):
+				if (os.path.isfile(workspace_folder) == False and workspace_folder == ".metadata"):
+					item_submenu = gtk.MenuItem(entry)
+					item_submenu.connect('activate', open_eclipse, os.path.join(workspaces_path, entry))
+					menu_workspaces.append(item_submenu)
+					break
+
+	return item_workspaces
+
+def open_eclipse(widget, path):
+	eclipse_path = read_config("eclipse", "path")
+	subprocess.call(eclipse_path + "/./eclipse -data " + path, shell=True)
+
+def read_config(section, name):
+	config = ConfigParser.ConfigParser()
+	config.readfp(open('config.properties'))
+	return config.get(section, name)
 
 def service_named_restart(_):
 	resultado = None

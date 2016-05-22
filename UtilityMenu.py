@@ -43,13 +43,6 @@ def build_menu():
 
 	menu.append(build_workspaces_menu())
 
-	image = gtk.Image()
-	image.set_pixel_size(1)
-	image.set_from_file(os.path.abspath('IMG/eclipse.xpm'))
-	menu_item = gtk.ImageMenuItem("Xucripse")
-	menu_item.set_image(image)
-	menu.append(menu_item)
-
 	item_quit = gtk.MenuItem('Fechar')
 	item_quit.connect('activate', quit)
 	menu.append(item_quit)
@@ -59,7 +52,11 @@ def build_menu():
 def build_workspaces_menu():
 	workspaces_path = read_config("workspaces", "path")
 
-	item_workspaces = gtk.MenuItem('Eclipse')
+	image = gtk.Image()
+	image.set_pixel_size(1)
+	image.set_from_file(os.path.abspath('IMG/eclipse.xpm'))
+	item_workspaces = gtk.ImageMenuItem("Eclipse")
+	item_workspaces.set_image(image)
 	menu_workspaces = gtk.Menu()
 	item_workspaces.set_submenu(menu_workspaces)
 
